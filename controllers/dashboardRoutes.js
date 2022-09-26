@@ -1,14 +1,18 @@
 const router = require("express").Router();
 const sequelize = require("../config/connection");
-const { User, Post, Comment } = require("../models");
+const { Post, User, Comment } = require("../models");
+const withAuth = require("../utils/auth");
 
-router.get("/", async (req, res) => {
+router.get("/", withAuth, async (req, res) => {
   await Post.findAll({
-    attributes: ["id", "title", "content", "created_at"],
+    where: {
+      user_id: req.session.user_id,
+    },
+    attributes: ["id", "title", "content"],
     include: [
       {
         model: Comment,
-        attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+        attributes: ["id", "comment_text", "post_id", "user_id"],
         include: {
           model: User,
           attributes: ["username"],
@@ -21,15 +25,14 @@ router.get("/", async (req, res) => {
     ],
   })
     .then((PostData) => {
-      const posts = PostData.map((post) =>
-        post.get({
+      const profile = PostData.map((data) =>
+        data.get({
           plain: true,
         })
       );
-
-      res.render("homepage", {
-        posts,
-        loggedIn: req.session.loggedIn,
+      res.render("dashboard", {
+        profile,
+        loggedIn: true,
       });
     })
     .catch((err) => {
@@ -38,7 +41,7 @@ router.get("/", async (req, res) => {
     });
 });
 
-router.get("/post/:id", async (req, res) => {
+router.get("/edit/:id", withAuth, async (req, res) => {
   await Post.findOne({
     where: {
       id: req.params.id,
@@ -71,9 +74,9 @@ router.get("/post/:id", async (req, res) => {
         plain: true,
       });
 
-      res.render("single-post", {
+      res.render("edit-post", {
         post,
-        loggedIn: req.session.loggedIn,
+        loggedIn: true,
       });
     })
     .catch((err) => {
@@ -82,27 +85,10 @@ router.get("/post/:id", async (req, res) => {
     });
 });
 
-router.get("/login", (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect("/");
-    return;
-  }
-
-  res.render("login");
-});
-
-router.get("/signup", (req, res) => {
-  if (req.session.loggedIn) {
-    res.redirect("/");
-    return;
-  }
-
-  res.render("signup");
-});
-
-router.get("*", (req, res) => {
-  res.status(404).send("Can't go there!");
-  // res.redirect('/');
+router.get("/new", (req, res) => {
+  res.render("add-post", {
+    loggedIn: true,
+  });
 });
 
 module.exports = router;
