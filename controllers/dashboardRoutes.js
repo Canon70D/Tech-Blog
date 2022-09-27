@@ -74,7 +74,7 @@ router.get("/edit/:id", withAuth, async (req, res) => {
         plain: true,
       });
 
-      res.render("edit-post", {
+      res.render("postEdit", {
         post,
         loggedIn: true,
       });
@@ -86,7 +86,7 @@ router.get("/edit/:id", withAuth, async (req, res) => {
 });
 
 router.get("/new", (req, res) => {
-  res.render("add-post", {
+  res.render("postAdd", {
     loggedIn: true,
   });
 });
