@@ -77,48 +77,31 @@ router.post("/", async (req, res) => {
     });
 });
 
-router.post("/login", async (req, res) => {
-  await User.findOne({
+router.post("/login", (req, res) => {
+  User.findOne({
     where: {
-      username: req.body.username,
+      email: req.body.email,
     },
-  }).then((UserData) => {
-    if (!UserData) {
+  }).then((dbUserData) => {
+    if (!dbUserData) {
       res.status(400).json({
-        message: "No user with that username!",
+        message: "No user with that email address!",
       });
       return;
     }
-
-    req.session.save(() => {
-      req.session.user_id = UserData.id;
-      req.session.username = UserData.username;
-      req.session.loggedIn = true;
-
-      res.json({
-        user: UserData,
-        message: "You are now logged in!",
-      });
-    });
-
-    const validPassword = UserData.checkPassword(req.body.password);
-
+    const validPassword = dbUserData.checkPassword(req.body.password);
     if (!validPassword) {
-      res.status(400).json({
-        message: "Incorrect password!",
-      });
+      res.status(400).json({ message: "Incorrect password!" });
       return;
     }
 
     req.session.save(() => {
-      req.session.user_id = UserData.id;
-      req.session.username = UserData.username;
+      // declare session variables
+      req.session.user_id = dbUserData.user_id;
+      req.session.username = dbUserData.username;
       req.session.loggedIn = true;
 
-      res.json({
-        user: UserData,
-        message: "You are now logged in!",
-      });
+      res.json({ user: dbUserData, message: "You are now logged in!" });
     });
   });
 });
