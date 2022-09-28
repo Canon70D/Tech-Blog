@@ -2,14 +2,14 @@
     <button type="submit" class="btn" id="create-new-post">+ Create new post</button>
 </section>
 
-{{#if posts.length}}
+{{#if profile.length}}
 <section>
     <h2>Your Dashboard</h2>
     <ul class="post-list">
-        {{#each posts as |post|}}
+        {{#each profile as |post|}}
         <li>
             {{> post-info post}}
-            <a href="/dashboard/edit/{{post.id}}" class="edit-link">edit post</a>
+            <a href="/dashboard/edit/{{post.id}}" class="edit-link">Edit post</a>
         </li>
         {{/each}}
     </ul>
