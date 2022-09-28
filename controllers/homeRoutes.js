@@ -2,6 +2,7 @@ const router = require("express").Router();
 const sequelize = require("../config/connection");
 const { User, Post, Comment } = require("../models");
 
+//find all post
 router.get("/", async (req, res) => {
   await Post.findAll({
     attributes: ["id", "title", "content", "created_at"],
@@ -38,6 +39,7 @@ router.get("/", async (req, res) => {
     });
 });
 
+//single post
 router.get("/post/:id", async (req, res) => {
   await Post.findOne({
     where: {
@@ -102,7 +104,6 @@ router.get("/signup", (req, res) => {
 
 router.get("*", (req, res) => {
   res.status(404).send("Can't go there!");
-  // res.redirect('/');
 });
 
 module.exports = router;
